@@ -1,14 +1,25 @@
-# PhotoCraft archival mirror
+# PhotoCraft — independent archival snapshots
 
-This repository is an **independent, automated Git archive** of [storytold/photocraft](https://github.com/storytold/photocraft) (ArtCraft project). It is not affiliated with the original maintainers.
+**Upstream:** [storytold/photocraft](https://github.com/storytold/photocraft) (ArtCraft / Photoshop-style software)
 
-- **Mirror branches:** [`upstream/main`](../../tree/upstream/main) and any other `upstream/*` branches, copied with their original Git history.
-- **Retained history:** immutable `retained/<commit-sha>` tags preserve previously observed branch tips even if upstream later force-pushes or removes branches.
-- **Upstream release tags:** copied under `source-tags/*` when available; existing copies are never force-overwritten.
-- **Schedule:** GitHub Actions once a day at approximately 12:17 JST, plus manual runs.
-- **Source unavailable:** synchronization fails safely; existing archived refs are left untouched.
-- **Control branch:** `main` contains this explanation and the scheduled archiver workflow; it is intentionally separate from the mirrored application source.
+This repository independently preserves the public **Git commit history** of the upstream repository through immutable [GitHub Release snapshots](../../releases). It is not a GitHub fork and is not affiliated with upstream maintainers.
 
-> **Scope:** Git history (including normal tracked files and commit graph) only. Git LFS objects, GitHub Releases binaries, issues, pull requests, and discussions are not included. This is not an offline backup: a second copy outside GitHub is recommended. Verify the original project's license before using or redistributing its code.
+## How it works
 
-To inspect the project source, switch the branch selector to `upstream/main`.
+- GitHub Actions checks upstream every day at about **12:17 JST** (03:17 UTC), or when manually triggered.
+- If any upstream branch or tag changes, the workflow creates a new `snapshot-<fingerprint>` Release containing `upstream.bundle` and `SNAPSHOT.txt`.
+- Every bundle is a complete Git snapshot (all observed Git branches and tags, with original commit IDs). Old snapshots are **never overwritten or deleted** by the workflow.
+- If upstream is unavailable, the task fails safely: previously saved snapshots remain untouched.
+- No personal token or local GitHub CLI is needed for the automatic process.
+
+## Restore from a snapshot
+
+Download `upstream.bundle` from a snapshot Release, then use:
+
+```bash
+git clone upstream.bundle restored-project
+```
+
+The default `main` branch contains only these archive instructions and the workflow, **not** the application source. To inspect original source code, restore the bundle.
+
+**Limits:** Git LFS content, GitHub Releases binaries, issues/PRs/discussions and externally hosted files are not included. GitHub storage is not an off-site backup; keep a separate copy for stronger preservation. Check the original license before redistributing or using the code.
